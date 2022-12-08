@@ -3,6 +3,8 @@ from app.db import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
+# comment
+
 
 class Comment(Base):
     __tablename__ = 'comments'
