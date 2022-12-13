@@ -89,3 +89,51 @@ def upvote():
         db.rollback()
         return jsonify(message='Upvote failed'), 500
     return '', 204
+
+
+@bp.route('/posts', methods=['POST'])
+def post():
+    data = request.get_json()
+    db = get_db()
+    try:
+        newPost = Post(
+            post_url=data['post_url'],
+            user_id=session.get('user_id'),
+            title=data['title']
+        )
+        db.add(newPost)
+        db.commit()
+    except:
+        print(sys.exc_info()[0])
+        db.rollback()
+        return jsonify(message='post created failed'), 500
+    return jsonify(id=newPost.id)
+
+
+@bp.route('/posts/<id>', methods=['PUT'])
+def editPost(id):
+    data = request.get_json()
+    db = get_db()
+    try:
+        post = db.query(Post).filter(Post.id == id).one()
+        post.title = data['title']
+        db.commit()
+    except:
+        print(sys.exc_info()[0])
+        db.rollback()
+        return jsonify(message='post not found'), 400
+    return '', 204
+
+
+@bp.route('/posts/<id>', methods=['DELETE'])
+def delPost(id):
+    db = get_db()
+    try:
+        post = db.query(Post).filter(Post.id == id).one()
+        db.delete(post)
+        db.commit()
+    except:
+        print(sys.exc_info()[0])
+        db.rollback()
+        return jsonify(message='post not found'), 400
+    return '', 204
